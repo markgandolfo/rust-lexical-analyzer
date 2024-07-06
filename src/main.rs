@@ -47,8 +47,10 @@ fn process_tokens(file_contents: &String) -> String {
             '}' => "RIGHT_BRACE } null",
             '*' => "STAR * null",
             '+' => "PLUS + null",
+            '-' => "MINUS - null",
             '.' => "DOT . null",
             ',' => "COMMA , null",
+            ';' => "SEMICOLON ; null",
             _ => "",
         })
         .collect::<Vec<&str>>();
