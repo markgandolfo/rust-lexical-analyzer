@@ -70,6 +70,21 @@ fn process_tokens(file_contents: String) -> i32 {
                 }
                 _ => println!("BANG ! null"),
             },
+            '>' => match chars.peek() {
+                Some('=') => {
+                    println!("GREATER_EQUAL >= null");
+                    chars.next();
+                }
+                _ => println!("GREATER > null"),
+            },
+            '<' => match chars.peek() {
+                Some('=') => {
+                    println!("LESS_EQUAL <= null");
+                    chars.next();
+                }
+                _ => println!("LESS < null"),
+            },
+
             '\n' => line_number += 1,
             invalid => {
                 eprintln!(
