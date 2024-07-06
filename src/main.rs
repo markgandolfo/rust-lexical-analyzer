@@ -94,6 +94,27 @@ fn process_tokens(file_contents: String) -> i32 {
                 },
                 _ => println!("SLASH / null"),
             },
+            '"' => {
+                let mut str = String::new();
+                loop {
+                    match chars.peek() {
+                        Some(&'"') => {
+                            chars.next();
+                            println!("STRING \"{}\" {}", str, str);
+                            break;
+                        }
+                        Some(&c) => {
+                            str.push(c);
+                            chars.next();
+                        }
+                        None => {
+                            eprintln!("[line {}] Error: Unterminated string.", line_number,);
+                            result = 65;
+                            break;
+                        }
+                    }
+                }
+            }
             ' ' | '\r' | '\t' => {}
 
             '\n' => line_number += 1,
