@@ -24,7 +24,7 @@ fn main() {
 
             // Uncomment this block to pass the first stage
             if !file_contents.is_empty() {
-                println!("{}", process_tokens(&file_contents));
+                process_tokens(&file_contents);
             } else {
                 println!("EOF  null"); // Placeholder, remove this line when implementing the scanner
             }
@@ -36,16 +36,6 @@ fn main() {
     }
 }
 
-fn process_tokens(file_contents: &String) -> String {
-    let chars: Vec<char> = file_contents.chars().collect();
-    let mut tokens = chars
-        .into_iter()
-        .map(|c| match c {
-            '(' => "LEFT_PAREN ( null",
-            ')' => "RIGHT_PAREN ) null",
-            _ => "",
-        })
-        .collect::<Vec<&str>>();
-    tokens.push("EOF  null");
-    tokens.join("\n")
+fn process_tokens(&file_contents: String) {
+    let chars: Vec<char> = file_contents.chars().collect().iter().for_each(|c| {});
 }
