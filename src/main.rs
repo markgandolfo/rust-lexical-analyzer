@@ -63,6 +63,13 @@ fn process_tokens(file_contents: String) -> i32 {
                 }
                 _ => println!("EQUAL = null"),
             },
+            '!' => match chars.peek() {
+                Some('=') => {
+                    println!("BANG_EQUAL != null");
+                    chars.next();
+                }
+                _ => println!("BANG ! null"),
+            },
             '\n' => line_number += 1,
             invalid => {
                 eprintln!(
