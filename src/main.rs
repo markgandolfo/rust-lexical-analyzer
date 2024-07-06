@@ -43,6 +43,8 @@ fn process_tokens(file_contents: &String) -> String {
         .map(|c| match c {
             '(' => "LEFT_PAREN ( null",
             ')' => "RIGHT_PAREN ) null",
+            '{' => "LEFT_BRACE ( null",
+            '}' => "RIGHT_BRACE ) null",
             _ => "",
         })
         .collect::<Vec<&str>>();
