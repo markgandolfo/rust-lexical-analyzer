@@ -1,5 +1,4 @@
 use std::env;
-use std::fmt::format;
 use std::fs;
 use std::io::{self, Write};
 use std::process::exit;
@@ -83,6 +82,21 @@ fn process_tokens(file_contents: String) -> i32 {
                     chars.next();
                 }
                 _ => println!("LESS < null"),
+            },
+            '/' => match chars.peek() {
+                Some('/') => {
+                    loop {
+                        let n = chars.peek();
+                        if n == Some(&'\n') || n == None {
+                            break;
+                        } else {
+                            chars.next();
+                        }
+                    }
+
+                    line_number += 1;
+                }
+                _ => println!("SLASH / null"),
             },
 
             '\n' => line_number += 1,
