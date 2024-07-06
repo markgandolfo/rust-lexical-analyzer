@@ -42,7 +42,9 @@ fn main() {
 fn process_tokens(file_contents: String) -> i32 {
     let mut line_number = 1;
     let mut result = 0;
-    for c in file_contents.chars() {
+    let mut chars = file_contents.chars().peekable();
+
+    while let Some(c) = chars.next() {
         match c {
             '(' => println!("LEFT_PAREN ( null"),
             ')' => println!("RIGHT_PAREN ) null"),
@@ -54,6 +56,13 @@ fn process_tokens(file_contents: String) -> i32 {
             '.' => println!("DOT . null"),
             ',' => println!("COMMA , null"),
             ';' => println!("SEMICOLON ; null"),
+            '=' => match chars.peek() {
+                Some('=') => {
+                    println!("EQUAL_EQUAL == null");
+                    chars.next();
+                }
+                _ => println!("EQUAL = null"),
+            },
             '\n' => line_number += 1,
             invalid => {
                 eprintln!(
