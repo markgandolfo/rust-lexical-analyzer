@@ -1,6 +1,8 @@
 use std::env;
+use std::fmt::format;
 use std::fs;
 use std::io::{self, Write};
+use std::process::exit;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,7 +26,8 @@ fn main() {
 
             // Uncomment this block to pass the first stage
             if !file_contents.is_empty() {
-                println!("{}", process_tokens(&file_contents));
+                let result = process_tokens(file_contents);
+                exit(result)
             } else {
                 println!("EOF  null"); // Placeholder, remove this line when implementing the scanner
             }
@@ -36,24 +39,34 @@ fn main() {
     }
 }
 
-fn process_tokens(file_contents: &String) -> String {
-    let chars: Vec<char> = file_contents.chars().collect();
-    let mut tokens = chars
-        .into_iter()
-        .map(|c| match c {
-            '(' => "LEFT_PAREN ( null",
-            ')' => "RIGHT_PAREN ) null",
-            '{' => "LEFT_BRACE { null",
-            '}' => "RIGHT_BRACE } null",
-            '*' => "STAR * null",
-            '+' => "PLUS + null",
-            '-' => "MINUS - null",
-            '.' => "DOT . null",
-            ',' => "COMMA , null",
-            ';' => "SEMICOLON ; null",
-            _ => "",
-        })
-        .collect::<Vec<&str>>();
-    tokens.push("EOF  null");
-    tokens.join("\n")
+fn process_tokens(file_contents: String) -> i32 {
+    let mut line_number = 1;
+    let mut result = 0;
+    for c in file_contents.chars() {
+        match c {
+            '(' => println!("LEFT_PAREN ( null"),
+            ')' => println!("RIGHT_PAREN ) null"),
+            '{' => println!("LEFT_BRACE {{ null"),
+            '}' => println!("RIGHT_BRACE }} null"),
+            '*' => println!("STAR * null"),
+            '+' => println!("PLUS + null"),
+            '-' => println!("MINUS - null"),
+            '.' => println!("DOT . null"),
+            ',' => println!("COMMA , null"),
+            ';' => println!("SEMICOLON ; null"),
+            '\n' => line_number += 1,
+            invalid => {
+                eprintln!(
+                    "[line {}] Error: Unexpected character: {}",
+                    line_number,
+                    String::from(invalid)
+                );
+                result = 65;
+            }
+        };
+    }
+
+    println!("EOF  null");
+
+    result
 }
