@@ -98,6 +98,7 @@ fn process_tokens(file_contents: String) -> i32 {
                 }
                 _ => println!("SLASH / null"),
             },
+            ' ' | '\r' | '\t' => {}
 
             '\n' => line_number += 1,
             invalid => {
