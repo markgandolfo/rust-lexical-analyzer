@@ -84,18 +84,14 @@ fn process_tokens(file_contents: String) -> i32 {
                 _ => println!("LESS < null"),
             },
             '/' => match chars.peek() {
-                Some('/') => {
-                    loop {
-                        let n = chars.peek();
-                        if n == Some(&'\n') || n == None {
-                            break;
-                        } else {
-                            chars.next();
-                        }
+                Some('/') => loop {
+                    let n = chars.peek();
+                    if n == Some(&'\n') || n == None {
+                        break;
+                    } else {
+                        chars.next();
                     }
-
-                    line_number += 1;
-                }
+                },
                 _ => println!("SLASH / null"),
             },
             ' ' | '\r' | '\t' => {}
