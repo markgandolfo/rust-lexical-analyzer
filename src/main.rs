@@ -119,8 +119,36 @@ fn process_tokens(file_contents: String) -> i32 {
 
             '\n' => line_number += 1,
 
-            c if c.is_numeric() => {
-                println!("it's a me, a number");
+            c if c.is_digit(10) => {
+                let mut number = String::from(c);
+                let mut has_decimal = false;
+
+                while let Some(t) = chars.peek() {
+                    if t.is_digit(10) {
+                        number.push(*t);
+                        chars.next();
+                    } else if *t == '.' && !has_decimal {
+                        has_decimal = true;
+                        number.push(*t);
+                        chars.next();
+                    } else {
+                        break;
+                    }
+                }
+
+                if number.ends_with('.') {
+                    let mut display_number = number.clone();
+                    display_number.push('0');
+                    number.pop();
+                    println!("NUMBER {} {}", number, display_number);
+                    println!("DOT . null");
+                } else if !number.contains('.') {
+                    let mut display_number = number.clone();
+                    display_number.push_str(".0");
+                    println!("NUMBER {} {}", number, display_number);
+                } else {
+                    println!("NUMBER {} {}", number, number);
+                }
             }
 
             invalid => {
