@@ -3,6 +3,31 @@ use std::fs;
 use std::io::{self, Write};
 use std::process::exit;
 
+mod token;
+use token::{Token, TokenList};
+
+fn match_reserved(identifier: &str) -> Token {
+    match identifier {
+        "and" => Token::And,
+        "class" => Token::Class,
+        "else" => Token::Else,
+        "false" => Token::False,
+        "for" => Token::For,
+        "fun" => Token::Fun,
+        "if" => Token::If,
+        "nil" => Token::Nil,
+        "or" => Token::Or,
+        "print" => Token::Print,
+        "return" => Token::Return,
+        "super" => Token::Super,
+        "this" => Token::This,
+        "true" => Token::True,
+        "var" => Token::Var,
+        "while" => Token::While,
+        _ => Token::Identifier,
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
@@ -15,20 +40,18 @@ fn main() {
 
     match command.as_str() {
         "tokenize" => {
-            // You can use print statements as follows for debugging, they'll be visible when running tests.
-            writeln!(io::stderr(), "Logs from your program will appear here!").unwrap();
-
             let file_contents = fs::read_to_string(filename).unwrap_or_else(|_| {
                 writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
                 String::new()
             });
 
-            // Uncomment this block to pass the first stage
+            let token_list = TokenList::new();
+
             if !file_contents.is_empty() {
-                let result = process_tokens(file_contents);
+                let result = process_tokens(file_contents, token_list);
                 exit(result)
             } else {
-                println!("EOF  null"); // Placeholder, remove this line when implementing the scanner
+                println!("{}", Token::EOF.to_string());
             }
         }
         _ => {
@@ -49,15 +72,23 @@ fn truncate_zeros(s: &str) -> String {
     parts.join(".")
 }
 
-fn process_tokens(file_contents: String) -> i32 {
+fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
     let mut line_number = 1;
     let mut result = 0;
     let mut chars = file_contents.chars().peekable();
 
     while let Some(c) = chars.next() {
         match c {
-            '(' => println!("LEFT_PAREN ( null"),
-            ')' => println!("RIGHT_PAREN ) null"),
+            '(' => {
+                let token = Token::LeftParen;
+                println!("{}", &token.to_string());
+                token_list.add(token);
+            }
+            ')' => {
+                let token = Token::RightParen;
+                println!("{}", &token.to_string());
+                token_list.add(token);
+            }
             '{' => println!("LEFT_BRACE {{ null"),
             '}' => println!("RIGHT_BRACE }} null"),
             '*' => println!("STAR * null"),
@@ -111,7 +142,8 @@ fn process_tokens(file_contents: String) -> i32 {
                     match chars.peek() {
                         Some(&'"') => {
                             chars.next();
-                            println!("STRING \"{}\" {}", str, str);
+                            let token = Token::String(str);
+                            println!("{}", token.to_string());
                             break;
                         }
                         Some(&c) => {
@@ -176,7 +208,9 @@ fn process_tokens(file_contents: String) -> i32 {
                         break;
                     }
                 }
-                println!("IDENTIFIER {} null", identifier);
+
+                let token = match_reserved(&identifier);
+                println!("{} {} null", token.to_string(), identifier);
             }
 
             invalid => {
@@ -190,7 +224,7 @@ fn process_tokens(file_contents: String) -> i32 {
         };
     }
 
-    println!("EOF  null");
+    println!("{}", Token::EOF.to_string());
 
     result
 }
