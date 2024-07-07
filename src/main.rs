@@ -6,28 +6,6 @@ use std::process::exit;
 mod token;
 use token::{Token, TokenList};
 
-fn match_reserved(identifier: &str) -> Token {
-    match identifier {
-        "and" => Token::And,
-        "class" => Token::Class,
-        "else" => Token::Else,
-        "false" => Token::False,
-        "for" => Token::For,
-        "fun" => Token::Fun,
-        "if" => Token::If,
-        "nil" => Token::Nil,
-        "or" => Token::Or,
-        "print" => Token::Print,
-        "return" => Token::Return,
-        "super" => Token::Super,
-        "this" => Token::This,
-        "true" => Token::True,
-        "var" => Token::Var,
-        "while" => Token::While,
-        _ => Token::Identifier,
-    }
-}
-
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
@@ -45,10 +23,11 @@ fn main() {
                 String::new()
             });
 
-            let token_list = TokenList::new();
+            let mut token_list = TokenList::new();
 
             if !file_contents.is_empty() {
-                let result = process_tokens(file_contents, token_list);
+                let result = process_tokens(file_contents, &mut token_list);
+                token_list.print_all();
                 exit(result)
             } else {
                 println!("{}", Token::EOF.to_string());
@@ -61,69 +40,50 @@ fn main() {
     }
 }
 
-fn truncate_zeros(s: &str) -> String {
-    let mut parts: Vec<&str> = s.split('.').collect();
-    if parts.len() > 1 {
-        parts[1] = parts[1].trim_end_matches('0');
-        if parts[1].is_empty() {
-            parts[1] = "0";
-        }
-    }
-    parts.join(".")
-}
-
-fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
+fn process_tokens(file_contents: String, token_list: &mut TokenList) -> i32 {
     let mut line_number = 1;
     let mut result = 0;
     let mut chars = file_contents.chars().peekable();
 
     while let Some(c) = chars.next() {
         match c {
-            '(' => {
-                let token = Token::LeftParen;
-                println!("{}", &token.to_string());
-                token_list.add(token);
-            }
-            ')' => {
-                let token = Token::RightParen;
-                println!("{}", &token.to_string());
-                token_list.add(token);
-            }
-            '{' => println!("LEFT_BRACE {{ null"),
-            '}' => println!("RIGHT_BRACE }} null"),
-            '*' => println!("STAR * null"),
-            '+' => println!("PLUS + null"),
-            '-' => println!("MINUS - null"),
-            '.' => println!("DOT . null"),
-            ',' => println!("COMMA , null"),
-            ';' => println!("SEMICOLON ; null"),
+            '(' => token_list.add(Token::LeftParen),
+            ')' => token_list.add(Token::RightParen),
+            '{' => token_list.add(Token::LeftBrace),
+            '}' => token_list.add(Token::RightBrace),
+            '*' => token_list.add(Token::Star),
+            '+' => token_list.add(Token::Plus),
+            '-' => token_list.add(Token::Minus),
+            '.' => token_list.add(Token::Dot),
+            ',' => token_list.add(Token::Comma),
+            ';' => token_list.add(Token::SemiColon),
             '=' => match chars.peek() {
                 Some('=') => {
-                    println!("EQUAL_EQUAL == null");
+                    token_list.add(Token::EqualEqual);
                     chars.next();
                 }
-                _ => println!("EQUAL = null"),
+                _ => token_list.add(Token::Equal),
             },
             '!' => match chars.peek() {
                 Some('=') => {
-                    println!("BANG_EQUAL != null");
+                    token_list.add(Token::BangEqual);
                     chars.next();
                 }
-                _ => println!("BANG ! null"),
+                _ => token_list.add(Token::Bang),
             },
             '>' => match chars.peek() {
                 Some('=') => {
-                    println!("GREATER_EQUAL >= null");
+                    token_list.add(Token::GreaterEqual);
                     chars.next();
                 }
-                _ => println!("GREATER > null"),
+                _ => token_list.add(Token::Greater),
             },
             '<' => match chars.peek() {
                 Some('=') => {
-                    println!("LESS_EQUAL <= null");
+                    token_list.add(Token::LessEqual);
                     chars.next();
                 }
-                _ => println!("LESS < null"),
+                _ => token_list.add(Token::Less),
             },
             '/' => match chars.peek() {
                 Some('/') => loop {
@@ -134,7 +94,7 @@ fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
                         chars.next();
                     }
                 },
-                _ => println!("SLASH / null"),
+                _ => token_list.add(Token::Slash),
             },
             '"' => {
                 let mut str = String::new();
@@ -143,7 +103,7 @@ fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
                         Some(&'"') => {
                             chars.next();
                             let token = Token::String(str);
-                            println!("{}", token.to_string());
+                            token_list.add(token);
                             break;
                         }
                         Some(&c) => {
@@ -179,21 +139,10 @@ fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
                     }
                 }
 
+                token_list.add(Token::Number(number.clone()));
+
                 if number.ends_with('.') {
-                    let mut display_number = number.clone();
-                    display_number.push('0');
-                    number.pop();
-                    display_number = truncate_zeros(&display_number);
-                    println!("NUMBER {} {}", number, display_number);
-                    println!("DOT . null");
-                } else if !number.contains('.') {
-                    let mut display_number = number.clone();
-                    display_number.push_str(".0");
-                    display_number = truncate_zeros(&display_number);
-                    println!("NUMBER {} {}", number, display_number);
-                } else {
-                    let display_number = truncate_zeros(&number);
-                    println!("NUMBER {} {}", number, display_number);
+                    token_list.add(Token::Dot);
                 }
             }
 
@@ -209,8 +158,9 @@ fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
                     }
                 }
 
-                let token = match_reserved(&identifier);
-                println!("{} {} null", token.to_string(), identifier);
+                let token = Token::match_reserved(&identifier);
+                token_list.add(token);
+                // println!("{} {} null", token.to_string(), identifier);
             }
 
             invalid => {
@@ -224,7 +174,7 @@ fn process_tokens(file_contents: String, mut token_list: TokenList) -> i32 {
         };
     }
 
-    println!("{}", Token::EOF.to_string());
+    token_list.add(Token::EOF);
 
     result
 }
