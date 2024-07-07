@@ -38,6 +38,17 @@ fn main() {
     }
 }
 
+fn truncate_zeros(s: &str) -> String {
+    let mut parts: Vec<&str> = s.split('.').collect();
+    if parts.len() > 1 {
+        parts[1] = parts[1].trim_end_matches('0');
+        if parts[1].is_empty() {
+            parts[1] = "0";
+        }
+    }
+    parts.join(".")
+}
+
 fn process_tokens(file_contents: String) -> i32 {
     let mut line_number = 1;
     let mut result = 0;
@@ -123,13 +134,13 @@ fn process_tokens(file_contents: String) -> i32 {
                 let mut number = String::from(c);
                 let mut has_decimal = false;
 
-                while let Some(t) = chars.peek() {
-                    if t.is_digit(10) {
-                        number.push(*t);
+                while let Some(n) = chars.peek() {
+                    if n.is_digit(10) {
+                        number.push(*n);
                         chars.next();
-                    } else if *t == '.' && !has_decimal {
+                    } else if *n == '.' && !has_decimal {
                         has_decimal = true;
-                        number.push(*t);
+                        number.push(*n);
                         chars.next();
                     } else {
                         break;
@@ -140,15 +151,32 @@ fn process_tokens(file_contents: String) -> i32 {
                     let mut display_number = number.clone();
                     display_number.push('0');
                     number.pop();
+                    display_number = truncate_zeros(&display_number);
                     println!("NUMBER {} {}", number, display_number);
                     println!("DOT . null");
                 } else if !number.contains('.') {
                     let mut display_number = number.clone();
                     display_number.push_str(".0");
+                    display_number = truncate_zeros(&display_number);
                     println!("NUMBER {} {}", number, display_number);
                 } else {
-                    println!("NUMBER {} {}", number, number);
+                    let display_number = truncate_zeros(&number);
+                    println!("NUMBER {} {}", number, display_number);
                 }
+            }
+
+            c if c.is_alphabetic() || c == '_' => {
+                let mut identifier = String::from(c);
+
+                while let Some(p) = chars.peek() {
+                    if p.is_alphanumeric() || *p == '_' {
+                        identifier.push(*p);
+                        chars.next();
+                    } else {
+                        break;
+                    }
+                }
+                println!("IDENTIFIER {} null", identifier);
             }
 
             invalid => {
