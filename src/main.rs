@@ -118,6 +118,11 @@ fn process_tokens(file_contents: String) -> i32 {
             ' ' | '\r' | '\t' => {}
 
             '\n' => line_number += 1,
+
+            c if c.is_numeric() => {
+                println!("it's a me, a number");
+            }
+
             invalid => {
                 eprintln!(
                     "[line {}] Error: Unexpected character: {}",
