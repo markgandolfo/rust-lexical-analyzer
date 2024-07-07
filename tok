@@ -1,1 +1,16 @@
-and bar _hello "world" ( ) < > <= >= . 12345.12345.6543.
+// A comment should be ignored
+class Result {
+    fun hello() {
+        var result = (a + b) > 7 and "Success" != "Failure" or x >= 5;
+
+        while (result) {
+            var counter = 0;
+            counter = counter + 1;
+            if (counter == 10) {
+                return nil;
+            }
+        }
+
+        return result;
+    }
+}
