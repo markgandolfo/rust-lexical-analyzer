@@ -1,34 +1,32 @@
-[![progress-banner](https://backend.codecrafters.io/progress/interpreter/11b419a2-cf82-40fe-b17c-662ff9b2fb65)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+## Simple lexical analyzer built in Rust. 
 
-This is a starting point for Rust solutions to the
-["Build Your Own Build your own Interpreter" Challenge](https://app.codecrafters.io/courses/interpreter/overview).
+This is a simple lexical analyzer built in Rust. It reads a file and tokenizes it. The tokens are then printed to the console.
 
-_Add a description of your course here_
+The tokens are defined in the `token.rs` file
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## Sample token file
 
-# Passing the first stage
+```
+// A comment should be ignored
+class Result {
+    fun hello() {
+        var result = (a + b) > 7 and "Success" != "Failure" or x >= 5;
 
-The entry point for your `<fill_in_executable_name>` implementation is in
-`src/main.rs`. Study and uncomment the relevant code, and push your changes to
-pass the first stage:
+        while (result) {
+            var counter = 0;
+            counter = counter + 1;
+            if (counter == 10) {
+                return nil;
+            }
+        }
 
-```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
+        return result;
+    }
+}
 ```
 
-Time to move on to the next stage!
+## Usage
 
-# Stage 2 & beyond
-
-Note: This section is for stages 2 and beyond.
-
-1. Ensure you have `cargo (1.77)` installed locally
-1. Run `./<fill_in_script_name>.sh` to run your program, which is implemented in
-   `src/main.rs`. This command compiles your Rust project, so it might be slow
-   the first time you run it. Subsequent runs will be fast.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+```sh
+$ ./your_program_name tokenize <file>
+```
